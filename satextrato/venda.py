@@ -389,16 +389,18 @@ class ExtratoCFeVenda(ExtratoCFe):
         iniciado = False
 
         for obs in self.root.findall('./infCFe/infAdic/obsFisco'):
-            if not iniciado:
-                self.normal()
-                self.esquerda()
-                self.avanco()
-                self.condensado()
-                iniciado = True
+            if not obs.attrib['xCampo'] == 'xCampo' and not obs.findtext(
+                    'xTexto') == 'xTexto':
+                if not iniciado:
+                    self.normal()
+                    self.esquerda()
+                    self.avanco()
+                    self.condensado()
+                    iniciado = True
 
-            self.quebrar(u'{}: {}'.format(
-                    obs.attrib['xCampo'],
-                    obs.findtext('xTexto')))
+                self.quebrar(u'{}: {}'.format(
+                        obs.attrib['xCampo'],
+                        obs.findtext('xTexto')))
 
         if iniciado:
             self.condensado() # desliga
