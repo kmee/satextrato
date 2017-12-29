@@ -36,7 +36,7 @@ class ExtratoCFeVenda(ExtratoCFe):
     """Implementa impressão do extrato do CF-e de venda, normal e resumido."""
 
 
-    def __init__(self, fp, impressora, resumido=False):
+    def __init__(self, fp, impressora, site_sefaz=False, resumido=False):
         """Inicia uma instância de :class:`ExtratoCFeVenda`.
 
         :param fp: Um objeto *file-like* para o XML que contém o CF-e de venda.
@@ -48,6 +48,7 @@ class ExtratoCFeVenda(ExtratoCFe):
         self._resumido = resumido
         self.anotacoes_antes_obs_contribuinte = []
         self.anotacoes_corpo = []
+        self.site_sefaz = site_sefaz
 
 
     def apresentar_item(self, det):
@@ -510,3 +511,9 @@ class ExtratoCFeVenda(ExtratoCFe):
         self.impressora.qrcode(ersat.dados_qrcode(self._tree),
                 qrcode_module_size=conf.qrcode.tamanho_modulo,
                 qrcode_ecc_level=conf.qrcode.nivel_correcao)
+
+        self.avanco()
+        self.centro()
+        if br.uf_pelo_codigo(
+                int(self.root.findtext('./infCFe/ide/cUF'))) == 'CE':
+            self.texto(self.site_sefaz)
