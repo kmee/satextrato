@@ -514,8 +514,6 @@ class ExtratoCFeVenda(ExtratoCFe):
                 qrcode_module_size=conf.qrcode.tamanho_modulo,
                 qrcode_ecc_level=conf.qrcode.nivel_correcao)
 
-        self.avanco()
-        if br.uf_pelo_codigo(
-                int(self.root.findtext('./infCFe/ide/cUF'))) == 'CE':
+        if self.site_sefaz:
             self.negrito()
-            self.quebrar(self.site_sefaz)
+            self.texto(self.site_sefaz)
