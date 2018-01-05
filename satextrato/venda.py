@@ -389,8 +389,10 @@ class ExtratoCFeVenda(ExtratoCFe):
         iniciado = False
 
         for obs in self.root.findall('./infCFe/infAdic/obsFisco'):
-            if not obs.attrib['xCampo'] == 'xCampo1' and not obs.findtext(
-                    'xTexto') == 'xTexto1':
+            if (not obs.attrib['xCampo'] == 'xCampo1' and not obs.findtext(
+                    'xTexto') == 'xTexto1') and (
+                    not obs.attrib['xCampo'] == 'xCampo' and not obs.findtext(
+                        'xTexto') == 'xTexto'):
                 if not iniciado:
                     self.normal()
                     self.esquerda()
@@ -515,5 +517,5 @@ class ExtratoCFeVenda(ExtratoCFe):
                 qrcode_ecc_level=conf.qrcode.nivel_correcao)
 
         if self.site_sefaz:
-            self.negrito()
+            self.condensado()
             self.texto(self.site_sefaz)
