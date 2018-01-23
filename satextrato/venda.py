@@ -95,6 +95,7 @@ class ExtratoCFeVenda(ExtratoCFe):
 
         cProd = prod.findtext('cProd')
         xProd = prod.findtext('xProd')
+        vInfAdProd = det.findtext('infAdProd')
         uCom = prod.findtext('uCom')
         qCom = Decimal(prod.findtext('qCom'))
         vUnCom = Decimal(prod.findtext('vUnCom'))
@@ -108,7 +109,8 @@ class ExtratoCFeVenda(ExtratoCFe):
             detalhe = u'{:s} {:s} x {:n} ({:n}) {:n}'.format(
                     util.texto_decimal(qCom), uCom, vUnCom, vItem12741, vProd)
 
-        texto_item = u'{0:03d} {1:s} {2:s}'.format(nItem, cProd, xProd)
+        texto_item = u'{0:03d} {1:s} {2:s} {3:s}'.format(
+            nItem, cProd, xProd, vInfAdProd)
 
         self.normal()
         self.esquerda()
