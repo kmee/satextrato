@@ -36,7 +36,7 @@ class ExtratoCFeVenda(ExtratoCFe):
     """Implementa impressão do extrato do CF-e de venda, normal e resumido."""
 
 
-    def __init__(self, fp, impressora, resumido=False):
+    def __init__(self, fp, impressora, site_sefaz=False, resumido=False):
         """Inicia uma instância de :class:`ExtratoCFeVenda`.
 
         :param fp: Um objeto *file-like* para o XML que contém o CF-e de venda.
@@ -48,6 +48,7 @@ class ExtratoCFeVenda(ExtratoCFe):
         self._resumido = resumido
         self.anotacoes_antes_obs_contribuinte = []
         self.anotacoes_corpo = []
+        self.site_sefaz = site_sefaz
 
 
     def apresentar_item(self, det):
@@ -94,6 +95,7 @@ class ExtratoCFeVenda(ExtratoCFe):
 
         cProd = prod.findtext('cProd')
         xProd = prod.findtext('xProd')
+        vInfAdProd = det.findtext('infAdProd')
         uCom = prod.findtext('uCom')
         qCom = Decimal(prod.findtext('qCom'))
         vUnCom = Decimal(prod.findtext('vUnCom'))
@@ -107,7 +109,8 @@ class ExtratoCFeVenda(ExtratoCFe):
             detalhe = u'{:s} {:s} x {:n} ({:n}) {:n}'.format(
                     util.texto_decimal(qCom), uCom, vUnCom, vItem12741, vProd)
 
-        texto_item = u'{0:03d} {1:s} {2:s}'.format(nItem, cProd, xProd)
+        texto_item = u'{0:03d} {1:s} {2:s} {3:s}'.format(
+            nItem, cProd, xProd, vInfAdProd)
 
         self.normal()
         self.esquerda()
@@ -388,16 +391,20 @@ class ExtratoCFeVenda(ExtratoCFe):
         iniciado = False
 
         for obs in self.root.findall('./infCFe/infAdic/obsFisco'):
-            if not iniciado:
-                self.normal()
-                self.esquerda()
-                self.avanco()
-                self.condensado()
-                iniciado = True
+            if (not obs.attrib['xCampo'] == 'xCampo1' and not obs.findtext(
+                    'xTexto') == 'xTexto1') and (
+                    not obs.attrib['xCampo'] == 'xCampo' and not obs.findtext(
+                        'xTexto') == 'xTexto'):
+                if not iniciado:
+                    self.normal()
+                    self.esquerda()
+                    self.avanco()
+                    self.condensado()
+                    iniciado = True
 
-            self.quebrar(u'{}: {}'.format(
-                    obs.attrib['xCampo'],
-                    obs.findtext('xTexto')))
+                self.quebrar(u'{}: {}'.format(
+                        obs.attrib['xCampo'],
+                        obs.findtext('xTexto')))
 
         if iniciado:
             self.condensado() # desliga
@@ -510,3 +517,7 @@ class ExtratoCFeVenda(ExtratoCFe):
         self.impressora.qrcode(ersat.dados_qrcode(self._tree),
                 qrcode_module_size=conf.qrcode.tamanho_modulo,
                 qrcode_ecc_level=conf.qrcode.nivel_correcao)
+
+        if self.site_sefaz:
+            self.condensado()
+            self.texto(self.site_sefaz)
